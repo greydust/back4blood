@@ -1,0 +1,182 @@
+<html>
+	<head>
+		<style>
+			table, th, td {
+				border: 1px solid black;
+			}
+		</style>
+		<script>
+			async function process(event) {
+				const grids = document.querySelectorAll(".cleanerStatus");
+				for (const grid of grids) {
+					grid.style.backgroundColor = "red";
+					grid.innerText = "";
+				}
+				const reader = new FileReader();
+				reader.readAsText(event.target.files[0]);
+				reader.addEventListener("load", () => {
+					const data = JSON.parse(reader.result);
+					const keys = data.onlineDataCache.stats.missionsCompleted_Secured.keys;
+					for (const [key, _] of Object.entries(keys)) {
+						const keyValues = key.split("::");
+						if (keyValues.length === 3 && keyValues[1] === "hard") {
+							const grid = document.querySelector(`.${keyValues[0]}.${keyValues[2]}`);
+							grid.style.backgroundColor = "green";
+							grid.innerText = "O";
+						}
+					}
+				}, false);
+			}
+		</script>
+	</head>
+	<body>
+		<input type="file" id="file-uploader" data-target="file-uploader" accept=".sav" onchange='process(event)' />
+		<table id="status">
+		</table>
+		<script>
+					
+			const cleaners = [
+				{key: "hero_1", name: "伊凡傑洛"},
+				{key: "hero_2", name: "沃克"},
+				{key: "hero_3", name: "荷莉"},
+				{key: "hero_8", name: "老媽"},
+				{key: "hero_4", name: "霍夫曼"},
+				{key: "hero_5", name: "醫生"},
+				{key: "hero_6", name: "吉姆"},
+				{key: "hero_7", name: "卡麗"},
+			];
+			const acts = [
+				{
+					name: "章節1",
+					sectors: [
+						{
+							name: "惡魔歸來",
+							stages: [
+								{key: "evans_a", name: "1-1 復興堡"},
+								{key: "evans_b", name: "1-2 血之隧道"},
+								{key: "evans_c", name: "1-3 痛苦列車"},
+								{key: "evans_d", name: "1-4 十字路口"},
+							],
+						},
+						{
+							name: "搜尋營救",
+							stages: [
+								{key: "finley_rescue_a", name: "2-1 大掃除"},
+								{key: "finley_rescue_b", name: "2-2 書蟲"},
+								{key: "finley_rescue_c", name: "2-3 閃電酒吧戰"},
+							],
+						},
+						{
+							name: "黎明前的黑暗",
+							stages: [
+								{key: "finley_diner_a", name: "3-1 特別外送"},
+								{key: "finley_diner_b", name: "3-2 餐館"},
+							],
+						},
+						{
+							name: "藍皮狗山谷",
+							stages: [
+								{key: "bluedog_a", name: "4-1 壞種"},
+								{key: "bluedog_b", name: "4-2 地獄鐘聲"},
+								{key: "bluedog_c", name: "4-3 荒廢棄置"},
+								{key: "bluedog_d", name: "4-4 雷聲大作"},
+							],
+						},
+					],
+				},
+				{
+					name: "章節2",
+					sectors: [
+						{
+							name: "軍械庫",
+							stages: [
+								{key: "finley_police_a", name: "5-1 武力招喚"},
+								{key: "finley_police_b", name: "5-2 手巧之人"},
+							],
+						},
+						{
+							name: "B計畫",
+							stages: [
+								{key: "clog_a", name: "6-1 管道清理者"},
+								{key: "clog_b", name: "6-2 窮鄉僻壤"},
+								{key: "clog_c", name: "6-3 拖車毀壞"},
+								{key: "clog_d", name: "6-4 克拉格"},
+								{key: "clog_e", name: "6-5 殘破之鳥"},
+							],
+						},
+						{
+							name: "約柏記10:22",
+							stages: [
+								{key: "finley_church_a", name: "7-1 蠕蟲先鋒（一）"},
+								{key: "finley_church_b", name: "7-2 蠕蟲先鋒（二）"},
+								{key: "finley_church_c", name: "7-3 極度危險"},
+							],
+						},
+					],
+				},
+				{
+					name: "章節3",
+					sectors: [
+						{
+							name: "羅傑斯醫生的街區",
+							stages: [
+								{key: "manor_a", name: "8-1 戰場深處"},
+								{key: "manor_b", name: "8-2 燃燒之路"},
+								{key: "manor_c", name: "8-3 湖邊小屋"},
+								{key: "manor_d", name: "8-4 花園派對"},
+								{key: "manor_e", name: "8-5　T-5"},
+							],
+						},
+						{
+							name: "殘留物",
+							stages: [
+								{key: "cdc_a", name: "9-1 患難之交"},
+								{key: "cdc_b", name: "9-2 努力達標"},
+								{key: "cdc_c", name: "9-3 地獄之路"},
+								{key: "cdc_d", name: "9-4 屍體堆放處"},
+							],
+						},
+					],
+				},
+				{
+					name: "章節4",
+					sectors: [
+						{
+							name: "憎恨",
+							stages: [
+								{key: "titan_a", name: "10-1 憎恨"},
+							],
+						},
+					],
+				},
+			];
+			const statusTable = document.querySelector("#status");
+			const clearnTr = statusTable.appendChild(document.createElement("tr"));
+			clearnTr.appendChild(document.createElement("th"));
+			for (const cleaner of cleaners) {
+				const th = document.createElement("th");
+				th.innerText = cleaner.name;
+				clearnTr.appendChild(th);
+			}
+			for (const act of acts) {
+				for (const sector of act.sectors) {
+					const sectorTr = statusTable.appendChild(document.createElement("tr"))
+					const sectorTh = sectorTr.appendChild(document.createElement("th"));
+					sectorTh.colSpan = 9;
+					sectorTh.innerText = act.name + " " + sector.name;
+					for (const stage of sector.stages) {
+						const stageTr = statusTable.appendChild(document.createElement("tr"));
+						const stageNameTh = stageTr.appendChild(document.createElement("th"));
+						stageNameTh.innerText = stage.name;
+						for (const cleaner of cleaners) {
+							const stageCleanerTd = document.createElement("td");
+							stageCleanerTd.className = `cleanerStatus ${stage.key} ${cleaner.key}`;
+							stageCleanerTd.style.backgroundColor = "red";
+							stageTr.appendChild(stageCleanerTd);
+						}
+					}
+				}
+			}
+		</script>
+	</body>
+</html>
