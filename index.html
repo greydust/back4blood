@@ -21,7 +21,7 @@
 						const keyValues = key.split("::");
 						if (keyValues.length === 3 && keyValues[1] === "hard") {
 							const grid = document.querySelector(`.${keyValues[0]}.${keyValues[2]}`);
-							grid.style.backgroundColor = "green";
+							grid.style.backgroundColor = "#b6e285";
 							grid.innerText = "O";
 						}
 					}
@@ -174,7 +174,7 @@
 						for (const cleaner of cleaners) {
 							const stageCleanerTd = document.createElement("td");
 							stageCleanerTd.className = `cleanerStatus ${stage.key} ${cleaner.key}`;
-							stageCleanerTd.style.backgroundColor = "red";
+							stageCleanerTd.style.backgroundColor = "#CD5C5C";
 							stageTr.appendChild(stageCleanerTd);
 						}
 					}
