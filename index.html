@@ -9,7 +9,7 @@
 			async function process(event) {
 				const grids = document.querySelectorAll(".cleanerStatus");
 				for (const grid of grids) {
-					grid.style.backgroundColor = "red";
+					grid.style.backgroundColor = "#CD5C5C";
 					grid.innerText = "";
 				}
 				const reader = new FileReader();
@@ -21,7 +21,7 @@
 						const keyValues = key.split("::");
 						if (keyValues.length === 3 && keyValues[1] === "hard") {
 							const grid = document.querySelector(`.${keyValues[0]}.${keyValues[2]}`);
-							grid.style.backgroundColor = "#b6e285";
+							grid.style.backgroundColor = "#B6E285";
 							grid.innerText = "O";
 						}
 					}
