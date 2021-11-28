@@ -1,17 +1,11 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <html>
 	<head>
-		<style>
-			table, th, td {
-				border: 1px solid black;
-			}
-		</style>
 		<script>
 			async function process(event) {
-				const grids = document.querySelectorAll(".cleanerStatus");
-				for (const grid of grids) {
-					grid.style.backgroundColor = "#CD5C5C";
-					grid.innerText = "";
-				}
 				const reader = new FileReader();
 				reader.readAsText(event.target.files[0]);
 				reader.addEventListener("load", () => {
@@ -19,10 +13,29 @@
 					const keys = data.onlineDataCache.stats.missionsCompleted_Secured.keys;
 					for (const [key, _] of Object.entries(keys)) {
 						const keyValues = key.split("::");
-						if (keyValues.length === 3 && keyValues[1] === "hard") {
-							const grid = document.querySelector(`.${keyValues[0]}.${keyValues[2]}`);
-							grid.style.backgroundColor = "#B6E285";
-							grid.innerText = "O";
+						if (keyValues.length === 3) {
+							const grid = document.getElementById(`${keyValues[0]}+${keyValues[2]}`);
+							if (keyValues[1] === "easy") {
+								if (!grid.classList.contains("bg-warning") ||
+									!grid.classList.contains("bg-primary")) {
+									grid.className = "col bg-success border border-dark border-1";
+								}
+								const icon = document.createElement("i");
+								icon.className = "bi bi-dice-1";
+								grid.appendChild(icon);
+							} else if (keyValues[1] === "normal") {
+								if (!grid.classList.contains("bg-primary")) {
+									grid.className = "col bg-warning border border-dark border-1";
+								}
+								const icon = document.createElement("i");
+								icon.className = "bi bi-dice-2";
+								grid.appendChild(icon);
+							} else if (keyValues[1] === "hard") {
+								grid.className = "col bg-primary border border-dark border-1";
+								const icon = document.createElement("i");
+								icon.className = "bi bi-dice-3";
+								grid.appendChild(icon);
+							}
 						}
 					}
 				}, false);
@@ -30,14 +43,19 @@
 		</script>
 	</head>
 	<body>
-		<p>Steam檔案位置: %APPDATA%\..\Local\Back4Blood\Steam\Saved\SaveGames</p>
-		<p>XGP檔案位置: %APPDATA%\..\Local\Packages\WarnerBros.Interactive.<some key>\SystemAppData\wgs</p>
-		<p>檔名: PlayerProfileSettings.sav</p>
-		<input type="file" id="file-uploader" data-target="file-uploader" accept=".sav" onchange='process(event)' />
-		<table id="status">
-		</table>
+		<div class="container">
+			<p>Steam檔案位置: %APPDATA%\..\Local\Back4Blood\Steam\Saved\SaveGames</p>
+			<p>XGP檔案位置: %APPDATA%\..\Local\Packages\WarnerBros.Interactive.<some key>\SystemAppData\wgs</p>
+			<p>檔名: PlayerProfileSettings.sav</p>
+			<div class="row row-cols-auto">
+				<div class="col">
+					<input type="file" id="file-uploader" data-target="file-uploader" accept=".sav" onchange='process(event)' />
+				</div>
+			</div>
+			<div class="row" id="status">
+			</div>
+		</div>
 		<script>
-					
 			const cleaners = [
 				{key: "hero_1", name: "伊凡傑洛/Evangelo"},
 				{key: "hero_2", name: "沃克/Walker"},
@@ -110,8 +128,8 @@
 						{
 							name: "約柏記10:22",
 							stages: [
-								{key: "finley_church_a", name: "7-1 蠕蟲先鋒（一）"},
-								{key: "finley_church_b", name: "7-2 蠕蟲先鋒（二）"},
+								{key: "finley_church_a", name: "7-1 蠕蟲先鋒1"},
+								{key: "finley_church_b", name: "7-2 蠕蟲先鋒2"},
 								{key: "finley_church_c", name: "7-3 極度危險"},
 							],
 						},
@@ -154,28 +172,35 @@
 				},
 			];
 			const statusTable = document.querySelector("#status");
-			const clearnTr = statusTable.appendChild(document.createElement("tr"));
-			clearnTr.appendChild(document.createElement("th"));
+			const clearnRow = document.createElement("div");
+			clearnRow.className = "row";
+			statusTable.appendChild(clearnRow);
+			const empty = document.createElement("div");
+			empty.className = "col border border-dark border-1";
+			clearnRow.appendChild(empty);
 			for (const cleaner of cleaners) {
-				const th = document.createElement("th");
-				th.innerText = cleaner.name;
-				clearnTr.appendChild(th);
+				const clearnCol = document.createElement("div");
+				clearnCol.className = "col border border-dark border-1";
+				clearnCol.innerText = cleaner.name;
+				clearnRow.appendChild(clearnCol);
 			}
 			for (const act of acts) {
 				for (const sector of act.sectors) {
-					const sectorTr = statusTable.appendChild(document.createElement("tr"))
-					const sectorTh = sectorTr.appendChild(document.createElement("th"));
-					sectorTh.colSpan = 9;
-					sectorTh.innerText = act.name + " " + sector.name;
+					const sectorRow = statusTable.appendChild(document.createElement("div"))
+					sectorRow.className = "row bg-info border border-dark border-1";
+					sectorRow.innerText = act.name + " " + sector.name;
 					for (const stage of sector.stages) {
-						const stageTr = statusTable.appendChild(document.createElement("tr"));
-						const stageNameTh = stageTr.appendChild(document.createElement("th"));
-						stageNameTh.innerText = stage.name;
+						const stageRow = statusTable.appendChild(document.createElement("div"));
+						const stageCol = statusTable.appendChild(document.createElement("div"));
+						stageRow.className = "row";
+						stageCol.className = "col border border-dark border-1";
+						stageCol.innerText = stage.name;
+						stageRow.appendChild(stageCol);
 						for (const cleaner of cleaners) {
-							const stageCleanerTd = document.createElement("td");
-							stageCleanerTd.className = `cleanerStatus ${stage.key} ${cleaner.key}`;
-							stageCleanerTd.style.backgroundColor = "#CD5C5C";
-							stageTr.appendChild(stageCleanerTd);
+							const stageCleanerCol = document.createElement("div");
+							stageCleanerCol.id = `${stage.key}+${cleaner.key}`;
+							stageCleanerCol.className = "col bg-danger border border-dark border-1";
+							stageRow.appendChild(stageCleanerCol);
 						}
 					}
 				}
