@@ -7,34 +7,56 @@
 		<script>
 			async function process(event) {
 				const reader = new FileReader();
+
 				reader.readAsText(event.target.files[0]);
 				reader.addEventListener("load", () => {
 					const data = JSON.parse(reader.result);
 					const keys = data.onlineDataCache.stats.missionsCompleted_Secured.keys;
-					for (const [key, _] of Object.entries(keys)) {
+
+					for (const [key, val] of Object.entries(keys)) {
 						const keyValues = key.split("::");
 						if (keyValues.length === 3) {
 							const grid = document.getElementById(`${keyValues[0]}+${keyValues[2]}`);
+							const icon = document.createElement("i");
+
 							if (keyValues[1] === "easy") {
 								if (!grid.classList.contains("bg-warning") ||
 									!grid.classList.contains("bg-primary")) {
-									grid.className = "col bg-success border border-dark border-1";
+									grid.className = "col bg-success text-dark border border-dark border-1";
 								}
-								const icon = document.createElement("i");
 								icon.className = "bi bi-dice-1";
 								grid.appendChild(icon);
 							} else if (keyValues[1] === "normal") {
 								if (!grid.classList.contains("bg-primary")) {
-									grid.className = "col bg-warning border border-dark border-1";
+									grid.className = "col bg-warning text-dark border border-dark border-1";
 								}
-								const icon = document.createElement("i");
 								icon.className = "bi bi-dice-2";
 								grid.appendChild(icon);
 							} else if (keyValues[1] === "hard") {
-								grid.className = "col bg-primary border border-dark border-1";
-								const icon = document.createElement("i");
+								grid.className = "col bg-primary text-dark border border-dark border-1";
 								icon.className = "bi bi-dice-3";
 								grid.appendChild(icon);
+							}
+						}
+
+						if (keyValues.length === 1) {
+							const grid = document.getElementById(`${key}`.toLowerCase());
+							grid.innerText = val;
+
+							if (val < 25) {
+								grid.className = "col bg-secondary border border-dark border-1";
+								grid.innerText += "/25";
+							} else if (val >= 25 && val < 50) {
+								grid.className = "col bg-danger border border-dark border-1";
+								grid.innerText += "/50";
+							} else if (val >= 50 && val < 100) {
+								grid.className = "col bg-success border border-dark border-1";
+								grid.innerText += "/100";
+							} else if (val >= 100 && val < 250) {
+								grid.className = "col bg-warning border border-dark border-1";
+								grid.innerText += "/250";
+							} else {
+								grid.className = "col bg-primary border border-dark border-1";
 							}
 						}
 					}
@@ -43,16 +65,74 @@
 		</script>
 	</head>
 	<body>
+		<nav class="navbar">
+			<div class="container">
+
+			</div>
+		</nav>
 		<div class="container">
-			<p>Steam檔案位置: %APPDATA%\..\Local\Back4Blood\Steam\Saved\SaveGames</p>
-			<p>XGP檔案位置: %APPDATA%\..\Local\Packages\WarnerBros.Interactive.<some key>\SystemAppData\wgs</p>
-			<p>檔名: PlayerProfileSettings.sav</p>
 			<div class="row row-cols-auto">
 				<div class="col">
-					<input type="file" id="file-uploader" data-target="file-uploader" accept=".sav" onchange='process(event)' />
+					<span class="badge bg-primary">
+						<h6>
+							Steam檔案位置: %APPDATA%\..\Local\Back4Blood\Steam\Saved\SaveGames
+						</h6>
+					</span>
 				</div>
 			</div>
-			<i class="bi bi-dice-3 bg-primary" style="padding: 0px 2px 1px 2px"></i>:惡夢&emsp;<i class="bi bi-dice-2 bg-warning" style="padding: 0px 2px 1px 2px"></i>:老兵&emsp;<i class="bi bi-dice-1 bg-success" style="padding: 0px 3px 1px 2px"></i>:新兵
+			<div class="row row-cols-auto">
+				<div class="col">
+					<span class="badge bg-secondary">
+						<h6>
+							XGP檔案位置: %APPDATA%\..\Local\Packages\WarnerBros.Interactive.[some key]\SystemAppData\wgs
+						</h6>
+					</span>
+				</div>
+			</div>
+			<div class="row row-cols-auto">
+				<div class="col">
+					<span class="badge bg-success">
+						<h6>
+							檔名: PlayerProfileSettings.sav
+						</h6>
+					</span>
+				</div>
+			</div>
+			<div class="row row-cols-auto">
+				<div class="col">
+					<span class="badge bg-danger text-dark">
+						<h6>
+							<input type="file" id="file-uploader" class="custom-file-input" data-target="file-uploader" accept=".sav" onchange='process(event)' />
+						</h6>
+					</span>
+				</div>
+			</div>
+			<div class="row row-cols-auto">
+				<div class="col">
+					<span class="badge bg-light text-dark">
+						<h6>
+							<i class="bi bi-dice-3 bg-primary"></i>
+							惡夢
+						</h6>
+					</span>
+				</div>
+				<div class="col">
+					<span class="badge bg-light text-dark">
+						<h6>
+							<i class="bi bi-dice-2 bg-warning"></i>
+							老兵
+						</h6>
+					</span>
+				</div>
+				<div class="col">
+					<span class="badge bg-light text-dark">
+						<h6>
+							<i class="bi bi-dice-1 bg-success"></i>
+							新兵
+						</h6>
+					</span>
+				</div>
+			</div>
 			<div class="row" id="status">
 			</div>
 		</div>
@@ -174,31 +254,51 @@
 			];
 			const statusTable = document.querySelector("#status");
 			const clearnRow = document.createElement("div");
+			const clearnPlayRow = document.createElement("div");
+			const empty = document.createElement("div");
+			const play = document.createElement("div");
+
 			clearnRow.className = "row";
 			statusTable.appendChild(clearnRow);
-			const empty = document.createElement("div");
+
+			clearnPlayRow.className = "row text-dark";
+			statusTable.appendChild(clearnPlayRow);
+
 			empty.className = "col border border-dark border-1";
 			clearnRow.appendChild(empty);
+
+			play.className = "col border border-dark border-1";
+			play.innerText = "通關場次";
+			clearnPlayRow.appendChild(play);
 			for (const cleaner of cleaners) {
 				const clearnCol = document.createElement("div");
+				const clearnPlayCol = document.createElement("div");
+
 				clearnCol.className = "col border border-dark border-1";
 				clearnCol.innerText = cleaner.name;
 				clearnRow.appendChild(clearnCol);
+
+				clearnPlayCol.className = "col border border-dark border-1";
+				clearnPlayCol.id = `${cleaner.key}`;
+				clearnPlayRow.appendChild(clearnPlayCol);
 			}
 			for (const act of acts) {
 				for (const sector of act.sectors) {
-					const sectorRow = statusTable.appendChild(document.createElement("div"))
+					const sectorRow = statusTable.appendChild(document.createElement("div"));
+
 					sectorRow.className = "row bg-info border border-dark border-1";
 					sectorRow.innerText = act.name + " " + sector.name;
 					for (const stage of sector.stages) {
 						const stageRow = statusTable.appendChild(document.createElement("div"));
 						const stageCol = statusTable.appendChild(document.createElement("div"));
+
 						stageRow.className = "row";
 						stageCol.className = "col border border-dark border-1";
 						stageCol.innerText = stage.name;
 						stageRow.appendChild(stageCol);
 						for (const cleaner of cleaners) {
 							const stageCleanerCol = document.createElement("div");
+
 							stageCleanerCol.id = `${stage.key}+${cleaner.key}`;
 							stageCleanerCol.className = "col bg-danger border border-dark border-1";
 							stageRow.appendChild(stageCleanerCol);
